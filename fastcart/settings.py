@@ -142,11 +142,28 @@ WSGI_APPLICATION = 'fastcart.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
+#     )
+# }
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
-    )
-}
+     'default': {
+         'ENGINE': 'django.db.backends.postgresql',
+         'NAME': 'fastcart_db',
+         'USER': 'fastcart_user',
+         'PASSWORD': 1234,
+         'HOST': 'localhost',
+         'PORT': '5432',
+     }
+ }
+
+
+
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
