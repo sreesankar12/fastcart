@@ -1,0 +1,49 @@
+{% extends "oscar/checkout/checkout.html" %}
+{% load i18n %}
+{% load currency_filters %}
+{% block title %}
+    {% trans "Order preview" %} | {{ block.super }}
+{% endblock %}
+
+{% block checkout_nav %}
+    {% include 'oscar/checkout/nav.html' with step=4 %}
+{% endblock %}
+
+{% block checkout_title %}
+    {% trans "Preview order" %}
+{% endblock %}
+
+
+
+{% block place_order %}
+<script src="https://js.stripe.com/v3/"></script>
+    <script type="text/javascript">
+    var stripe = Stripe.setPublishableKey('pk_test_51LsNhRSBeZkgYlGWZeVlpGmXC9g1VW7cQ5pgyIgODPMzEcj98MKLTxDDBjc2npuWJlq2Xj6xvg5e9Z5YVQXrzowi00JNPTx9U6');
+    </script>
+<form action="{% url 'checkout:preview' %}" class="form-stacked" method="POST">
+
+    <form method="post" action="{% url 'checkout:preview' %}" id="place_order_form">
+        <input type="hidden" name="action" value="place_order" />
+        {% comment %}
+            When submitting sensitive data on the payment details page (eg a bankcard)
+            we don't want to save the data and so we pass the bound form to the preview
+            template and render it in a hidden div.  Then the payment information will
+            get re-submitted when the user confirms the order.
+        {% endcomment %}
+
+        <div style="display:none">
+            {% block hiddenforms %}
+                {{ stripe_token_form }}
+            {% endblock %}
+        </div>
+
+        <div class="form-group clearfix">
+            <div class="row">
+                <div class="col-sm-3 offset-sm-9">
+                     <button id='place-order' type="submit" class="btn btn-primary btn-lg btn-block" data-loading-text="{% trans 'Submitting...' %}">{% trans "Place order" %}</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</form>
+{% endblock place_order %}
