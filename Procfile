@@ -1,0 +1,1 @@
+web: gunicorn fastcart.wsgi --log-file -
