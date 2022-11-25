@@ -5,7 +5,7 @@ certifi==2022.9.24
 charset-normalizer==2.1.1
 dj-database-url==1.0.0
 Django==3.2.16
-django-extra-views==0.13.0
+#django-extra-views==0.13.0
 django-haystack==3.2.1
 django-oscar==3.1
 django-phonenumber-field==5.2.0
