@@ -19,10 +19,7 @@ class Facade(object):
 
     def charge(self, order_number, total, card, currency=settings.STRIPE_CURRENCY, description=None,
                metadata=None, **kwargs):
-        print("----------------------------------------------------")
-        print(order_number, total, "card >", card, "<card ", settings.STRIPE_CURRENCY)
-        print("----------------------------------------------------")
-        # print(total.incl_tax * 100).to_integral_value())
+
         try:
             return stripe.PaymentIntent.create(
                 amount=(total.incl_tax * 100).to_integral_value(),
@@ -60,9 +57,3 @@ class Facade(object):
 
         except stripe.error.StripeError as e:
             raise UnableToTakePayment(self.get_friendly_decline_message(e))
-    #
-    # def retrieve_source(self, id, card_token):
-    #     try:
-    #         return stripe.Customer.retrieve_source(id, card_token)
-    #     except stripe.error.StripeError as e:
-    #         raise InvalidGatewayRequestError(self.get_friendly_error_message(e))
