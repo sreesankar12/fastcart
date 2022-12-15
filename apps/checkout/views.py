@@ -42,29 +42,18 @@ class PaymentDetailsView(CorePaymentDetailsView):
         return ctx
 
     def handle_payment(self, order_number, total, **kwargs):
-        # ctx = super(PaymentDetailsView, self).get_context_data(**kwargs)
-        # print("handle payment -----------------------------------------------")
-        # print(ctx)
-        # print(self.request.POST)
-        # print(self.request.session)
-        print("total", total)
-        print(order_number)
-        # print(card)
+
         stripe_token = self.request.POST['stripeToken']
         user_email = self.request.user.email
         customer = Facade().create_customer(user_email, stripe_token)
-        print("-----------customer---------------")
-        print(customer)
-        print("--------------------------------")
+
         stripe_ref = Facade().charge_with_customer(
             order_number,
             total,
             customer=customer,
             description=self.payment_description(order_number, total, **kwargs),
             metadata=self.payment_metadata(order_number, total, **kwargs))
-        print("-----------stripe ref---------------")
-        print(stripe_ref)
-        print("--------------------------------")
+
         source_type, __ = SourceType.objects.get_or_create(name=PAYMENT_METHOD_STRIPE)
         source = Source(
             source_type=source_type,
@@ -72,14 +61,10 @@ class PaymentDetailsView(CorePaymentDetailsView):
             amount_allocated=total.incl_tax,
             amount_debited=total.incl_tax,
             reference=stripe_ref)
-        print("-----------source---------------")
-        print(source)
-        print("--------------------------------")
+
         self.add_payment_source(source)
 
         self.add_payment_event(PAYMENT_EVENT_PURCHASE, total.incl_tax)
-
-        # return source, stripe_ref.id
 
     def payment_description(self, order_number, total, **kwargs):
         return self.request.POST[STRIPE_EMAIL]
