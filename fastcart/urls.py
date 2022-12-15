@@ -31,4 +31,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', include(apps.get_app_config('oscar').urls[0])),
+    path("auth_accounts/", include("allauth.urls")),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

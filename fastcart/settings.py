@@ -29,7 +29,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+OSCAR_DEFAULT_CURRENCY = "INR"
 
+SITE_ID = 1
+LOGIN_REDIRECT_URL = "/"
 # Application definition
 
 INSTALLED_APPS = [
@@ -39,8 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # social auth
+    'django.contrib.sites',  # <--
 
-    'django.contrib.sites',
+
     'django.contrib.flatpages',
 
     'oscar.config.Shop',
@@ -80,9 +85,39 @@ INSTALLED_APPS = [
     'treebeard',
     'sorl.thumbnail',   # Default thumbnail backend, can be replaced
     'django_tables2',
+    # allauth apps
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
 ]
 
-SITE_ID = 1
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#
+#         'APP': {
+#             'client_id': '1025793841768-j88m7tmi1hh8bbhj0oe9p05slsk9v2a5.apps.googleusercontent.com',
+#             'secret': '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',
+#             'key': ''
+#         }
+#     }
+# }
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'OAUTH_PKCE_ENABLED': True,
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email','public_profile', 'user_friends'],
+    }
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -94,14 +129,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'oscar.apps.basket.middleware.BasketMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'fastcart.urls'
 
 AUTHENTICATION_BACKENDS = (
-    'oscar.apps.customer.auth_backends.EmailBackend',
+    # 'oscar.apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+
+# ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
 HAYSTACK_CONNECTIONS = {
     'default': {
@@ -125,6 +165,8 @@ TEMPLATES = [
                 'oscar.apps.checkout.context_processors.checkout',
                 'oscar.apps.communication.notifications.context_processors.notifications',
                 'oscar.core.context_processors.metadata',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -208,6 +250,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # STATIC_URL = '/static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+SOCIAL_AUTH_FACEBOOK_KEY = '482689993994967'
+SOCIAL_AUTH_FACEBOOK_SECRET = '138b2734914b984bd24144fd374c35e0'
+ACCOUNT_EMAIL_REQUIRED=True
+ACCOUNT_USERNAME_REQURIED=True
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
