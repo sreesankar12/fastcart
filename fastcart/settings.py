@@ -135,7 +135,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'fastcart.urls'
 
 AUTHENTICATION_BACKENDS = (
-    # 'oscar.apps.customer.auth_backends.EmailBackend',
+    'oscar.apps.customer.auth_backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
