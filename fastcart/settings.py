@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-3)u-^gxskq%=vfdftvc*b7n29!5a7&*#j8daju^k@skyfntz-i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'localhost', 'fastcart.tk']
+ALLOWED_HOSTS = ['*', 'localhost', 'fastcart.tk', '0.0.0.0.0']
 
 OSCAR_DEFAULT_CURRENCY = "INR"
 
