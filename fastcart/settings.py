@@ -101,6 +101,8 @@ INSTALLED_APPS = [
 
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 CKEDITOR_UPLOAD_PATH = "uploads/"
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
 from django.utils.translation import gettext_lazy as _
 
 # OSCAR_DASHBOARD_NAVIGATION.append({
