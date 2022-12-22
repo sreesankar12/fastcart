@@ -36,6 +36,7 @@
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 {% block browse_store_text %}{% trans "Categories" %}{% endblock %}
                             </a>
+
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 {% category_tree depth=1 as tree_categories %}
                                 <a class="dropdown-item" href="{% url 'catalogue:index' %}">{% trans "All Categories" %}</a>
@@ -51,6 +52,12 @@
                                 {% endblock %}
                             </div>
                         </li>
+                           <a class="ms-auto nav-link " href="{% url 'aboutus:terms' %}"  role="button" aria-haspopup="true" aria-expanded="false">
+                                {% block terms %}{% trans "Terms" %}{% endblock %}
+                            </a>
+                            <a class="ms-auto nav-link " href="{% url 'aboutus:aboutus' %}"  role="button"  aria-haspopup="true" aria-expanded="false">
+                                {% block about %}{% trans "About Us" %}{% endblock %}
+                            </a>
                    {% endblock %}
                </ul>
             {% endblock %}

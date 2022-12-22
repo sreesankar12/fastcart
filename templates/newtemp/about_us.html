@@ -1,0 +1,15 @@
+{% extends "oscar/layout.html" %}
+{% load i18n %}
+{% block content %}
+{% load static %}
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+
+<h1>ABOUT US</h1>
+<img src="{% static 'aboutus/images/contact.png' %}" class="img-fluid" alt="" width="1050" height="300">
+
+
+    {{ aboutus.description|safe }}
+
+
+{% endblock %}

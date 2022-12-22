@@ -32,4 +32,9 @@ urlpatterns = [
 
     path('', include(apps.get_app_config('oscar').urls[0])),
     path("auth_accounts/", include("allauth.urls")),
+    path('aboutus/', apps.get_app_config('aboutus').urls),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('dashboard/aboutus/', apps.get_app_config('aboutus_dashboard').urls),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

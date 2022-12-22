@@ -27,12 +27,12 @@ SECRET_KEY = 'django-insecure-3)u-^gxskq%=vfdftvc*b7n29!5a7&*#j8daju^k@skyfntz-i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'localhost', 'fastcart.tk', '0.0.0.0.0']
+ALLOWED_HOSTS = ['*', 'localhost', 'fastcartonline.tk', '0.0.0.0.0']
 
 OSCAR_DEFAULT_CURRENCY = "INR"
+OSCAR_PRODUCTS_PER_PAGE = 8
 
 SITE_ID = 1
-LOGIN_REDIRECT_URL = "/"
 # Application definition
 
 INSTALLED_APPS = [
@@ -80,6 +80,9 @@ INSTALLED_APPS = [
     'oscar.apps.dashboard.shipping.apps.ShippingDashboardConfig',
 
     # 3rd-party apps that oscar depends on
+    'ckeditor',
+    'apps.aboutus.apps.AboutUsConfig',
+    'apps.aboutus.dashboard.apps.DashboardConfig',
     'widget_tweaks',
     'haystack',
     'treebeard',
@@ -93,17 +96,25 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.facebook',
 ]
 
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#
-#         'APP': {
-#             'client_id': '1025793841768-j88m7tmi1hh8bbhj0oe9p05slsk9v2a5.apps.googleusercontent.com',
-#             'secret': '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',
-#             'key': ''
-#         }
-#     }
-# }
 
+
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+CKEDITOR_UPLOAD_PATH = "uploads/"
+from django.utils.translation import gettext_lazy as _
+
+OSCAR_DASHBOARD_NAVIGATION.append({
+    'label': _('About Us'),
+    'icon': 'fas fa-store',
+    'url_name': 'aboutus-dashboard:about-update',
+})
+
+OSCAR_DASHBOARD_NAVIGATION.append({
+    'label': _('T&C'),
+    'icon': 'fa-solid fa-file-circle-check',
+    'url_name': 'aboutus-dashboard:terms-update',
+})
+# <i class="fa-sharp fa-solid fa-file-check"></i>
+# <i class="fa-solid fa-file-circle-check"></i>
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
@@ -184,28 +195,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-#
-# DATABASES = {
-#     'default': dj_database_url.config(
-#         default='sqlite:////{0}'.format(os.path.join(BASE_DIR, 'db.sqlite3'))
-#     )
-# }
-
-# DATABASES = {
-#      'default': {
-#          'ENGINE': 'django.db.backends.postgresql',
-#          'NAME': 'fastcart_db',
-#          'USER': 'fastcart_user',
-#          'PASSWORD': 1234,
-#          'HOST': 'localhost',
-#          'PORT': '5432',
-#      }
-#  }
-
-
-
-
-
 
 
 # Password validation
@@ -241,10 +230,26 @@ USE_L10N = True
 USE_TZ = True
 
 
+INTERNAL_IPS = ('127.0.0.1')
+LOGIN_REDIRECT_URL = "/"
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#
+#         'APP': {
+#             'client_id': '1025793841768-j88m7tmi1hh8bbhj0oe9p05slsk9v2a5.apps.googleusercontent.com',
+#             'secret': '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',
+#             'key': ''
+#         }
+#     }
+# }
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
 MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # STATIC_URL = '/static/'
@@ -253,8 +258,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 SOCIAL_AUTH_FACEBOOK_KEY = '482689993994967'
 SOCIAL_AUTH_FACEBOOK_SECRET = '138b2734914b984bd24144fd374c35e0'
-ACCOUNT_EMAIL_REQUIRED=True
-ACCOUNT_USERNAME_REQURIED=True
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQURIED = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
