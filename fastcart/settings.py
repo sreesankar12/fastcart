@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'treebeard',
     'sorl.thumbnail',   # Default thumbnail backend, can be replaced
     'django_tables2',
+    # 'django.contrib.flatpages',
     # allauth apps
     'allauth',
     'allauth.account',
@@ -102,17 +103,17 @@ CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 CKEDITOR_UPLOAD_PATH = "uploads/"
 from django.utils.translation import gettext_lazy as _
 
-OSCAR_DASHBOARD_NAVIGATION.append({
-    'label': _('About Us'),
-    'icon': 'fas fa-store',
-    'url_name': 'aboutus-dashboard:about-update',
-})
-
-OSCAR_DASHBOARD_NAVIGATION.append({
-    'label': _('T&C'),
-    'icon': 'fa-solid fa-file-circle-check',
-    'url_name': 'aboutus-dashboard:terms-update',
-})
+# OSCAR_DASHBOARD_NAVIGATION.append({
+#     'label': _('About Us'),
+#     'icon': 'fas fa-store',
+#     'url_name': 'aboutus-dashboard:about-update',
+# })
+#
+# OSCAR_DASHBOARD_NAVIGATION.append({
+#     'label': _('T&C'),
+#     'icon': 'fa-solid fa-file-circle-check',
+#     'url_name': 'aboutus-dashboard:terms-update',
+# })
 # <i class="fa-sharp fa-solid fa-file-check"></i>
 # <i class="fa-solid fa-file-circle-check"></i>
 SOCIALACCOUNT_PROVIDERS = {
@@ -163,7 +164,7 @@ HAYSTACK_CONNECTIONS = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': ['templates','/home/sreesankar12/fastcart/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
