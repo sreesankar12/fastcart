@@ -72,3 +72,4 @@ class PaymentDetailsView(CorePaymentDetailsView):
     def payment_metadata(self, order_number, total, **kwargs):
         return {'order_number': order_number}
 
+

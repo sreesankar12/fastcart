@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     'oscar.apps.basket.apps.BasketConfig',
     'oscar.apps.payment.apps.PaymentConfig',
     'oscar.apps.offer.apps.OfferConfig',
-    'oscar.apps.order.apps.OrderConfig',
+    'apps.order.apps.OrderConfig',
     'oscar.apps.customer.apps.CustomerConfig',
     'oscar.apps.search.apps.SearchConfig',
     'oscar.apps.voucher.apps.VoucherConfig',
@@ -267,7 +267,17 @@ SOCIAL_AUTH_FACEBOOK_SECRET = '138b2734914b984bd24144fd374c35e0'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQURIED = False
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# email
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '465'
+EMAIL_HOST_USER = "sreesankar.sayone@gmail.com"
+ADMIN_EMAIL = "sreesankar36@gmail.com"
+EMAIL_HOST_PASSWORD = "oeycdmfwdswbajse"
+EMAIL_USE_SSL = True
+EMAIL_USE_TLS = False
+# DEFAULT_FROM_EMAIL = "*******"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
