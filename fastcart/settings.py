@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'apps.checkout.apps.CheckoutConfig',
     'oscar.apps.address.apps.AddressConfig',
     'oscar.apps.shipping.apps.ShippingConfig',
-    'oscar.apps.catalogue.apps.CatalogueConfig',
+    'apps.catalogue.apps.CatalogueConfig',
     'oscar.apps.catalogue.reviews.apps.CatalogueReviewsConfig',
     'oscar.apps.communication.apps.CommunicationConfig',
     'oscar.apps.partner.apps.PartnerConfig',
@@ -118,6 +118,31 @@ from django.utils.translation import gettext_lazy as _
 # })
 # <i class="fa-sharp fa-solid fa-file-check"></i>
 # <i class="fa-solid fa-file-circle-check"></i>
+
+
+OSCAR_SEARCH_FACETS = {
+'fields': OrderedDict([
+    ('product_class', {'name': _('Type'), 'field': 'product_class'}),
+    ('rating', {'name': _('Rating'), 'field': 'rating'}),
+]),
+'queries': OrderedDict([
+    ('price_range',
+     {
+         'name': _('Price range'),
+         'field': 'price',
+         'queries': [
+             # This is a list of (name, query) tuples where the name will
+             # be displayed on the front-end.
+             (_('0 to 20'), u'[0 TO 20]'),
+             (_('20 to 40'), u'[20 TO 40]'),
+             (_('40 to 60'), u'[40 TO 60]'),
+             (_('60+'), u'[60 TO *]'),
+         ]
+     }),
+])
+}
+
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
@@ -166,7 +191,7 @@ HAYSTACK_CONNECTIONS = {
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates','/home/sreesankar12/fastcart/templates'],
+        'DIRS': ['templates','/home/sreesankar362/fastcart/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
