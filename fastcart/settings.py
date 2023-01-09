@@ -299,13 +299,13 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '465'
 EMAIL_HOST_USER = "sreesankar.sayone@gmail.com"
 ADMIN_EMAIL = "sreesankar36@gmail.com"
-EMAIL_HOST_PASSWORD = "oeycdmfwdswbajse"
+EMAIL_HOST_PASSWORD = ""
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
 # DEFAULT_FROM_EMAIL = "*******"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-STRIPE_SECRET_KEY = "sk_test_51LsNhRSBeZkgYlGWi0zDQWo74A1gsQd6hkfj9pYLICclqNUXbokZdFCsBen3xrVVSyFmBaqjKmzAimCDUjXpsdKp004bf94EPq"
-STRIPE_PUBLISHABLE_KEY = "pk_test_51LsNhRSBeZkgYlGWZeVlpGmXC9g1VW7cQ5pgyIgODPMzEcj98MKLTxDDBjc2npuWJlq2Xj6xvg5e9Z5YVQXrzowi00JNPTx9U6"
+STRIPE_SECRET_KEY = ""
+STRIPE_PUBLISHABLE_KEY = ""
 STRIPE_CURRENCY = "inr"
