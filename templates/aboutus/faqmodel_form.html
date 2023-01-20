@@ -1,0 +1,17 @@
+{% extends 'oscar/dashboard/layout.html' %}
+{% block content %}
+<div class="col-6 ms-5 me-s p-5" style="">
+    <form method="post">{% csrf_token %}
+    {{form.media}}
+
+    <label >Question</label>
+    {{ form.title|safe }}
+    <br>
+    <label >Answer</label>
+
+    {{ form.description|safe }}
+    <input class="btn btn-success" type="submit" value="Save Changes">
+</form>
+</div>
+
+{% endblock%}

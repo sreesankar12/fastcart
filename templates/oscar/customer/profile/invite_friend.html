@@ -1,0 +1,15 @@
+{% extends "oscar/customer/baseaccountpage.html" %}
+
+{% load i18n %}
+
+{% block tabcontent%}
+
+
+<h4>Invite your friend to get 20% off coupon on their first purchase !</h4>
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success" > Invite</button>
+</form>
+{% endblock%}

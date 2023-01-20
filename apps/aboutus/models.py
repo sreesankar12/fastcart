@@ -4,13 +4,16 @@ from ckeditor.widgets import CKEditorWidget
 # Create your models here.
 
 
-class AboutUsModel(models.Model):
-    title = models.CharField(max_length=500)
+class FaqModel(models.Model):
+    title = models.TextField(max_length=500)
     description = RichTextField()
     updated_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         app_label = 'aboutus'
+
+    def __str__(self):
+        return self.title
 
 
 class TermsModel(models.Model):

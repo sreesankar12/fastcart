@@ -2,17 +2,17 @@ from django.shortcuts import render
 from django.views.generic import View
 # Create your views here.
 from oscar.core.loading import get_class, get_model
-from.models import AboutUsModel,TermsModel
+from .models import FaqModel, TermsModel
 
 
-class AboutUsView(View):
+class FaqView(View):
 
     def get(self, request, *args, **kwargs):
-        aboutus= AboutUsModel.objects.last()
+        faq = FaqModel.objects.order_by("updated_at")
         context = {
-            "aboutus": aboutus
+            "faq": faq
         }
-        return render(request, "newtemp/about_us.html", context)
+        return render(request, "aboutus/faq.html", context)
 
 
 class TermsView(View):

@@ -13,7 +13,10 @@ from oscar.defaults import *
 from pathlib import Path
 import os
 import dj_database_url
-
+import environ
+# Initialise environment variables
+env = environ.Env()
+environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -32,7 +35,7 @@ ALLOWED_HOSTS = ['*', 'localhost', 'fastcartonline.tk', '0.0.0.0.0']
 OSCAR_DEFAULT_CURRENCY = "INR"
 OSCAR_PRODUCTS_PER_PAGE = 8
 
-SITE_ID = 1
+SITE_ID = 2
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,11 +46,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # social auth
-    'django.contrib.sites',  # <--
+    'django.contrib.sites',
+    'django_celery_results',
+    # <--
 
 
     'django.contrib.flatpages',
-
+    'apps.accounts',
     'oscar.config.Shop',
     'oscar.apps.analytics.apps.AnalyticsConfig',
     'apps.checkout.apps.CheckoutConfig',
@@ -58,14 +63,14 @@ INSTALLED_APPS = [
     'oscar.apps.communication.apps.CommunicationConfig',
     'oscar.apps.partner.apps.PartnerConfig',
     'oscar.apps.basket.apps.BasketConfig',
-    'oscar.apps.payment.apps.PaymentConfig',
+    'apps.payment.apps.PaymentConfig',
     'oscar.apps.offer.apps.OfferConfig',
     'apps.order.apps.OrderConfig',
-    'oscar.apps.customer.apps.CustomerConfig',
+    'apps.customer.apps.CustomerConfig',
     'oscar.apps.search.apps.SearchConfig',
-    'oscar.apps.voucher.apps.VoucherConfig',
+    'apps.voucher.apps.VoucherConfig',
     'oscar.apps.wishlists.apps.WishlistsConfig',
-    'oscar.apps.dashboard.apps.DashboardConfig',
+    'apps.dashboard.apps.DashboardConfig',
     'oscar.apps.dashboard.reports.apps.ReportsDashboardConfig',
     'oscar.apps.dashboard.users.apps.UsersDashboardConfig',
     'oscar.apps.dashboard.orders.apps.OrdersDashboardConfig',
@@ -105,12 +110,12 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 from django.utils.translation import gettext_lazy as _
 
-# OSCAR_DASHBOARD_NAVIGATION.append({
-#     'label': _('About Us'),
-#     'icon': 'fas fa-store',
-#     'url_name': 'aboutus-dashboard:about-update',
-# })
-#
+OSCAR_DASHBOARD_NAVIGATION.append({
+    'label': _('FAQ'),
+    'icon': 'fas fa-store',
+    'url_name': 'aboutus-dashboard:faq-list',
+})
+
 # OSCAR_DASHBOARD_NAVIGATION.append({
 #     'label': _('T&C'),
 #     'icon': 'fa-solid fa-file-circle-check',
@@ -179,6 +184,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+# AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 
@@ -216,13 +222,24 @@ WSGI_APPLICATION = 'fastcart.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': env('ENGINE'),
+            'NAME': env('NAME'),
+            'USER': env('USER'),
+            'PASSWORD': env('PASSWORD'),
+            'HOST': "localhost",
+            'PORT': 5432,
+        }
     }
-}
 
 
 # Password validation
@@ -259,6 +276,7 @@ USE_TZ = True
 
 
 INTERNAL_IPS = ('127.0.0.1')
+
 LOGIN_REDIRECT_URL = "/"
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
@@ -277,6 +295,7 @@ LOGIN_REDIRECT_URL = "/"
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
@@ -297,15 +316,19 @@ ACCOUNT_USERNAME_REQURIED = False
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '465'
-EMAIL_HOST_USER = "sreesankar.sayone@gmail.com"
-ADMIN_EMAIL = "sreesankar36@gmail.com"
-EMAIL_HOST_PASSWORD = "oeycdmfwdswbajse"
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+ADMIN_EMAIL = env('ADMIN_EMAIL')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
-# DEFAULT_FROM_EMAIL = "*******"
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-STRIPE_SECRET_KEY = "sk_test_51LsNhRSBeZkgYlGWi0zDQWo74A1gsQd6hkfj9pYLICclqNUXbokZdFCsBen3xrVVSyFmBaqjKmzAimCDUjXpsdKp004bf94EPq"
-STRIPE_PUBLISHABLE_KEY = "pk_test_51LsNhRSBeZkgYlGWZeVlpGmXC9g1VW7cQ5pgyIgODPMzEcj98MKLTxDDBjc2npuWJlq2Xj6xvg5e9Z5YVQXrzowi00JNPTx9U6"
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
 STRIPE_CURRENCY = "inr"
+
+# CELERY_BROKER_URL = "redis://localhost:6379"
+BROKER_URL = 'amqp://guest:guest@localhost:5672/'
+# CELERY_RESULT_BACKEND = "redis://localhost:6379"

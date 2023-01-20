@@ -58,6 +58,9 @@
                             <a class="ms-auto nav-link " href="/pages/about-us/"  role="button"  aria-haspopup="true" aria-expanded="false">
                                 {% block about %}{% trans "About Us" %}{% endblock %}
                             </a>
+                            <a class="ms-auto nav-link " href="{% url 'aboutus:faq' %}"  role="button"  aria-haspopup="true" aria-expanded="false">
+                                {% block faq %}{% trans "FAQ" %}{% endblock %}
+                            </a>
                    {% endblock %}
                </ul>
             {% endblock %}

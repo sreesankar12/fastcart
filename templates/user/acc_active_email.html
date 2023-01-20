@@ -1,0 +1,12 @@
+{% autoescape off %}
+Hi ,
+Thank you for registering with FASTCART.
+Please click on the link to verify your email,
+
+<!--http://{{ domain }}{% url "customer:activate" uidb64=user_id token=token %}-->
+second
+http://{{ domain }}{% url "customer:activate" uidb64=uid token=token %}
+
+Thanks and Regards,
+Team FASTCART
+{% endautoescape %}

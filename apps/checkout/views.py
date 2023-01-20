@@ -16,9 +16,23 @@ from .facade import Facade
 from . import PAYMENT_METHOD_STRIPE, PAYMENT_EVENT_PURCHASE, STRIPE_EMAIL, STRIPE_TOKEN
 
 from . import forms
+from apps.order.models import Order
+from apps.voucher.models import UserVouchers
+from ..customer.models import Referrals, UserInvitation
+from ..customer.utils import apply_voucher_to_cart
+from ..voucher.models import ReferalVoucher
+from django.utils import timezone
 
+
+Applicator = get_class('offer.applicator', 'Applicator')
 SourceType = get_model('payment', 'SourceType')
 Source = get_model('payment', 'Source')
+RedirectRequired, UnableToTakePayment, PaymentError \
+    = get_classes('payment.exceptions', ['RedirectRequired',
+                                         'UnableToTakePayment',
+                                         'PaymentError'])
+
+UnableToPlaceOrder = get_class('order.exceptions', 'UnableToPlaceOrder')
 
 
 class PaymentDetailsView(CorePaymentDetailsView):
@@ -39,7 +53,47 @@ class PaymentDetailsView(CorePaymentDetailsView):
                     ctx['order_total'].incl_tax * 100
             ).to_integral_value()
             ctx['stripe_publishable_key'] = settings.STRIPE_PUBLISHABLE_KEY
+
         return ctx
+
+    def handle_first_order(self):
+
+        try:
+            user=self.request.user
+            referal_obj = Referrals.objects.get(user=user, status=False)
+            referrer = referal_obj.referred_by
+            referralcoupon = ReferalVoucher.objects.get(id=2)
+            referee_voucher = referralcoupon.referee_voucher
+            voucher = referralcoupon.voucher
+            referrer_baskets = referrer.baskets.all()
+
+            user_voucher = UserVouchers.objects.get(voucher=voucher,
+                                                    user=user, currently_used=True)
+
+            user_voucher.redeemed = True
+            user_voucher.redeemed_on = timezone.now()
+            user_voucher.redeemed_count = 1
+            user_voucher.currently_used = False
+            user_voucher.save()
+
+            referal_obj.status = True
+            referal_obj.save()
+            if referrer_baskets:
+                basket = referrer_baskets.last()
+                print(basket)
+                print(referee_voucher)
+                basket.vouchers.add(referee_voucher)
+                print(basket.vouchers.all())
+
+                Applicator().apply(basket, self.request.user,
+                                   self.request)
+                basket_vouchers = basket.vouchers.all()
+                print(basket_vouchers)
+                print(basket.vouchers.all())
+
+        except:
+            print("except")
+            pass
 
     def handle_payment(self, order_number, total, **kwargs):
 
@@ -63,13 +117,13 @@ class PaymentDetailsView(CorePaymentDetailsView):
             reference=stripe_ref)
 
         self.add_payment_source(source)
-
         self.add_payment_event(PAYMENT_EVENT_PURCHASE, total.incl_tax)
+
+        if not Order.objects.filter(user=self.request.user, is_first_order=True).exists():
+            self.handle_first_order()
 
     def payment_description(self, order_number, total, **kwargs):
         return self.request.POST[STRIPE_EMAIL]
 
     def payment_metadata(self, order_number, total, **kwargs):
         return {'order_number': order_number}
-
-

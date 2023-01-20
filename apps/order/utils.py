@@ -8,8 +8,11 @@ from django.utils.translation import gettext_lazy as _
 
 from oscar.apps.order.signals import order_placed
 from oscar.core.loading import get_class, get_model
+from django.utils import timezone
+
 
 from . import exceptions
+from ..voucher.models import UserVouchers
 
 Order = get_model('order', 'Order')
 Line = get_model('order', 'Line')
@@ -155,7 +158,13 @@ class OrderCreator(object):
         if 'site' not in order_data:
             order_data['site'] = Site._default_manager.get_current(request)
         order = Order(**order_data)
+
+        if not Order.objects.filter(user=user, is_first_order=True).exists():
+            order.is_first_order = True
+
         order.save()
+        print(order.is_first_order)
+        print(order)
         if surcharges is not None:
             for charge in surcharges:
                 Surcharge.objects.create(
@@ -217,7 +226,7 @@ class OrderCreator(object):
         self.create_line_price_models(order, order_line, basket_line)
         self.create_line_attributes(order, order_line, basket_line)
         self.create_additional_line_models(order, order_line, basket_line)
-
+        print("order line", order_line)
         return order_line
 
     def update_stock_records(self, line):
@@ -280,6 +289,14 @@ class OrderCreator(object):
         if voucher:
             order_discount.voucher_id = voucher.id
             order_discount.voucher_code = voucher.code
+            if voucher.code == "20%REFERAL":
+                user_voucher = UserVouchers.objects.get(user=order.user, voucher=voucher, currently_used=True)
+                user_voucher.redeemed = True
+                user_voucher.redeemed_on = timezone.now()
+                user_voucher.redeemed_count = 1
+                user_voucher.currently_used = False
+                user_voucher.save()
+
         order_discount.save()
 
     def record_discount(self, discount):
