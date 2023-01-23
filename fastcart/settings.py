@@ -316,14 +316,17 @@ ACCOUNT_USERNAME_REQURIED = False
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '465'
+
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 ADMIN_EMAIL = env('ADMIN_EMAIL')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
@@ -332,3 +335,4 @@ STRIPE_CURRENCY = "inr"
 # CELERY_BROKER_URL = "redis://localhost:6379"
 BROKER_URL = 'amqp://guest:guest@localhost:5672/'
 # CELERY_RESULT_BACKEND = "redis://localhost:6379"
+
