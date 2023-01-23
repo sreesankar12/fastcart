@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-3)u-^gxskq%=vfdftvc*b7n29!5a7&*#j8daju^k@skyfntz-i'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -52,7 +52,6 @@ INSTALLED_APPS = [
 
 
     'django.contrib.flatpages',
-    'apps.accounts',
     'oscar.config.Shop',
     'oscar.apps.analytics.apps.AnalyticsConfig',
     'apps.checkout.apps.CheckoutConfig',
@@ -85,6 +84,7 @@ INSTALLED_APPS = [
     'oscar.apps.dashboard.shipping.apps.ShippingDashboardConfig',
 
     # 3rd-party apps that oscar depends on
+    # 'zinnia',
     'ckeditor',
     'apps.aboutus.apps.AboutUsConfig',
     'apps.aboutus.dashboard.apps.DashboardConfig',
@@ -207,6 +207,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'oscar.apps.search.context_processors.search_form',
+                # 'django.template.context_processors.i18n',
                 'oscar.apps.checkout.context_processors.checkout',
                 'oscar.apps.communication.notifications.context_processors.notifications',
                 'oscar.core.context_processors.metadata',
@@ -222,7 +223,7 @@ WSGI_APPLICATION = 'fastcart.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-#
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',

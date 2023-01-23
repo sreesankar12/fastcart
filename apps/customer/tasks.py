@@ -14,7 +14,6 @@ from django.utils.encoding import force_bytes
 
 @shared_task()
 def send_registration_email_task(self, user):
-    print("celery task mail")
     current_site = get_current_site(self.request)
     subject = 'Welcome to Fastcart!,Verify your Account.'
     message = render_to_string('user/acc_active_email.html', {

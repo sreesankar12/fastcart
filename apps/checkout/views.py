@@ -80,19 +80,13 @@ class PaymentDetailsView(CorePaymentDetailsView):
             referal_obj.save()
             if referrer_baskets:
                 basket = referrer_baskets.last()
-                print(basket)
-                print(referee_voucher)
                 basket.vouchers.add(referee_voucher)
-                print(basket.vouchers.all())
-
                 Applicator().apply(basket, self.request.user,
                                    self.request)
                 basket_vouchers = basket.vouchers.all()
-                print(basket_vouchers)
-                print(basket.vouchers.all())
 
         except:
-            print("except")
+
             pass
 
     def handle_payment(self, order_number, total, **kwargs):

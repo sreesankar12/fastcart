@@ -163,8 +163,7 @@ class OrderCreator(object):
             order.is_first_order = True
 
         order.save()
-        print(order.is_first_order)
-        print(order)
+
         if surcharges is not None:
             for charge in surcharges:
                 Surcharge.objects.create(
@@ -226,7 +225,7 @@ class OrderCreator(object):
         self.create_line_price_models(order, order_line, basket_line)
         self.create_line_attributes(order, order_line, basket_line)
         self.create_additional_line_models(order, order_line, basket_line)
-        print("order line", order_line)
+
         return order_line
 
     def update_stock_records(self, line):

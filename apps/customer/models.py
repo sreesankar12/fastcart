@@ -32,11 +32,11 @@ class Invitation(models.Model):
     sender_invite_model = models.ForeignKey(UserInvitation, on_delete=models.CASCADE)
 
     def send(self, hostname):
-        print("inside send invitation")
+
         subject = u"Hey Friend, here’s your link to join Fastcart"
         template = get_template('oscar/customer/referal_email_new.html')
         domain = hostname
-        print(domain, "send fn")
+
         # sender_id = self.sender_id
         # sender= User.objects.get(pk=sender_id.user_id)
 

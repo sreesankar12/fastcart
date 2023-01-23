@@ -24,13 +24,11 @@ def apply_firstorder_voucher(request, voucher, user):
             basket.merge(other_basket, add_quantities=False)
 
     request.basket = basket
-    print("id of basket:", basket.id)
     basket.vouchers.clear()
     basket.vouchers.add(voucher)
     Applicator().apply(basket, request.user,
                        request)
     basket_vouchers = basket.vouchers.all()
-    print(basket_vouchers)
 
 
 def get_voucher(user, basket=None):
@@ -51,12 +49,12 @@ def get_voucher(user, basket=None):
                 if discount > highest_discount:
                     highest_discount = discount
                     highest_voucher = user_voucher.voucher
-    print(highest_voucher)
+
     return highest_voucher
 
 
 def apply_voucher_to_cart(basket, user=None, voucher=None):
-    print("apply voucher fn")
+
     # if not basket.owner:
     #     basket.owner = user
     #     basket.save(update_fields=['owner'])
@@ -69,7 +67,7 @@ def apply_voucher_to_cart(basket, user=None, voucher=None):
     # # voucher = get_voucher(user) if user else get_voucher(basket.owner)
     # status, error_message = False, None
     voucher = voucher
-    print(voucher)
+
 
     def add_voucher():
         if not voucher.is_expired() and voucher.is_active():
@@ -89,5 +87,5 @@ def apply_voucher_to_cart(basket, user=None, voucher=None):
 
         # Recalculate discounts to see if the voucher gives any
         Applicator().apply(basket, basket.owner)
-        print("applied")
+
 
