@@ -5,10 +5,9 @@
 __pycache__
 db.sqlite3
 media
-
 # Backup files #
 *.bak
-
+cache
 # If you are using PyCharm #
 # User-specific stuff
 .idea/**/workspace.xml

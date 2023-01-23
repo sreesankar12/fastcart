@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AboutUsModel,TermsModel
+from .models import FaqModel,TermsModel
 # Register your models here.
 from django.contrib import admin
 from django.contrib.flatpages.admin import FlatPageAdmin
@@ -13,7 +13,7 @@ class AboutUsAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(AboutUsModel, AboutUsAdmin)
+admin.site.register(FaqModel, AboutUsAdmin)
 admin.site.register(TermsModel)
 
 

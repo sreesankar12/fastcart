@@ -1,4 +1,3 @@
-from allauth.socialaccount.models import SocialAccount
 from django import http
 from django.conf import settings
 from django.contrib import messages
@@ -7,10 +6,15 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404, redirect
+from django.core.validators import validate_email
+from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.views import generic
+from django.views.generic import View
 
 from oscar.apps.customer.utils import get_password_reset_url
 from oscar.core.compat import get_user_model
@@ -18,8 +22,17 @@ from oscar.core.loading import (
     get_class, get_classes, get_model, get_profile_class)
 from oscar.core.utils import safe_referrer
 from oscar.views.generic import PostActionMixin
-
+from .models import Referrals
 from . import signals
+from .forms import ReferFriendForm
+from apps.customer.models import Invitation
+from apps.customer.tokens import account_activation_token
+from .utils import apply_firstorder_voucher
+from ..voucher.models import Voucher, ReferalVoucher, UserVouchers, VOUCHER_TYPE_FIRSTORDER, VOUCHER_TYPE_REFERRAL
+from apps.customer.models import UserInvitation
+
+# from .helpers import generate_unique_invite_code
+Applicator = get_class('offer.applicator', 'Applicator')
 
 PageTitleMixin, RegisterUserMixin = get_classes(
     'customer.mixins', ['PageTitleMixin', 'RegisterUserMixin'])
@@ -210,7 +223,6 @@ class AccountAuthView(RegisterUserMixin, generic.TemplateView):
         form = self.get_registration_form(bind_data=True)
         if form.is_valid():
             self.register_user(form)
-
             msg = self.get_registration_success_message(form)
             messages.success(self.request, msg)
 
@@ -220,14 +232,67 @@ class AccountAuthView(RegisterUserMixin, generic.TemplateView):
         return self.render_to_response(ctx)
 
     def get_registration_success_message(self, form):
-        return _("Thanks for registering!")
+        return _("Thanks for registering an email has been sent to you for verification.")
 
     def get_registration_success_url(self, form):
         redirect_url = form.cleaned_data['redirect_url']
         if redirect_url:
-            return redirect_url
+            return settings.LOGIN_REDIRECT_URL
 
         return settings.LOGIN_REDIRECT_URL
+
+
+class ActivateAccountWithToken(View):
+    """
+    Activate account using a link send to
+    users email after registering with a valid mail-id
+    """
+    def get(self, request, *args, **kwargs):
+
+        User = get_user_model()
+        basket_stat = request.basket.is_empty
+        try:
+            uidb64 = self.kwargs['uidb64']
+            token = self.kwargs['token']
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            messages.error(self.request, "Account activation failed !")
+            user = None
+            return HttpResponseRedirect(reverse('customer:login'))
+
+        if user is not None and account_activation_token.check_token(user, token):
+            user.is_active = True
+            UserInvitation.objects.get_or_create(invite_code=token, user=user)
+            user.save()
+            voucher = Voucher.objects.get(name="First order Coupen")
+            uservoucher = UserVouchers.objects.create(voucher=voucher,
+                                                      user=user,
+                                                      type=VOUCHER_TYPE_FIRSTORDER,
+                                                      currently_used=True)
+
+            apply_firstorder_voucher(request, voucher, user)
+            if 'fastcart-refercode' in request.session:
+                try:
+                    """
+                    if registered user is a referred user create a referral obj and add referral coupon to the referee.
+                    """
+                    referrer_obj = UserInvitation.objects.get(invite_code=request.session['fastcart-refercode'])
+                    referrer = referrer_obj.user
+                    referal_obj = Referrals.objects.create(user=user, referred_by=referrer)
+                    del request.session['fastcart-refercode']
+                    referralcoupon = ReferalVoucher.objects.get(id=2)
+                    referee_voucher = referralcoupon.referee_voucher
+                    referervoucher = UserVouchers.objects.create(voucher=referee_voucher,
+                                                                 user=referrer, type=VOUCHER_TYPE_REFERRAL,
+                                                                 currently_used=True)
+                except ObjectDoesNotExist:
+                    pass
+            messages.info(request, 'Thank you for your email confirmation')
+            auth_login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(self.request, "Welcome " + user.first_name + "!")
+            return HttpResponseRedirect(reverse('customer:login'))
 
 
 class LogoutView(generic.RedirectView):
@@ -255,8 +320,10 @@ class ProfileView(PageTitleMixin, generic.TemplateView):
     active_tab = 'profile'
 
     def get_context_data(self, **kwargs):
+        invite_form = ReferFriendForm()
         ctx = super().get_context_data(**kwargs)
         ctx['profile_fields'] = self.get_profile_fields(self.request.user)
+        ctx['invite_form'] = invite_form
         return ctx
 
     def get_profile_fields(self, user):
@@ -297,6 +364,57 @@ class ProfileView(PageTitleMixin, generic.TemplateView):
             'name': getattr(field, 'verbose_name'),
             'value': value,
         }
+
+
+class InviteFriend(generic.FormView):
+    """
+    invitation form and sending mail to friend with the referral link.
+    """
+
+    template_name = "oscar/customer/profile/invite_friend.html"
+    form_class = ReferFriendForm
+
+    def get_context_data(self, **kwargs):
+        context = super(InviteFriend, self).get_context_data(**kwargs)
+        context['page_title'] = 'Invite Friend'
+        context['active_tab'] = 'invite'
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = ReferFriendForm(request.POST)
+        if form.is_valid():
+            var = request.POST.get("email")
+            var = var.split(',')
+            for emailaddress in var:
+                try:
+                    user_invitation = UserInvitation.objects.get(user=request.user)
+                    emailaddress = emailaddress.strip()
+                    validate_email(emailaddress)
+                    invitation = Invitation(
+                        email=emailaddress,
+                        sender=request.user,
+                        sender_invite_model=user_invitation
+                    )
+                    hostname = self.request.get_host()
+                    print(hostname)
+                    invitation.save()
+                    invitation.send(hostname)
+                    messages.success(self.request, 'Your friend has been invited.')
+                except Exception as e:
+                    messages.error(self.request, 'Invitaion Failed')
+        else:
+            messages.info(self.request, 'Please provide a valid email')
+        return HttpResponseRedirect(reverse('customer:invite-friend'))
+
+
+class JoinByReferral(View):
+    """
+    saving the invite code in session on clicking the referral link and redirecting to register
+    """
+    def get(self, request, *args, **kwargs):
+        invite_code = self.kwargs['invite_code']
+        request.session['fastcart-refercode'] = invite_code
+        return HttpResponseRedirect(reverse('customer:login'))
 
 
 class ProfileUpdateView(PageTitleMixin, generic.FormView):
@@ -341,7 +459,6 @@ class ProfileUpdateView(PageTitleMixin, generic.FormView):
             'user': user,
             'reset_url': get_password_reset_url(old_user),
             'new_email': new_email,
-            'request': self.request,
         }
         CustomerDispatcher().send_email_changed_email_for_user(old_user, extra_context)
 
@@ -392,7 +509,6 @@ class ChangePasswordView(PageTitleMixin, generic.FormView):
         extra_context = {
             'user': user,
             'reset_url': get_password_reset_url(self.request.user),
-            'request': self.request,
         }
         CustomerDispatcher().send_password_changed_email_for_user(user, extra_context)
 

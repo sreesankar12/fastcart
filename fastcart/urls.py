@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import url
 
 from django.apps import apps
 from django.urls import include, path
@@ -36,6 +37,9 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('dashboard/aboutus/', apps.get_app_config('aboutus_dashboard').urls),
     path('pages/', include('django.contrib.flatpages.urls')),
+
+    # url(r'^weblog/', include('zinnia.urls')),
+    # url(r'^comments/', include('django_comments.urls')),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

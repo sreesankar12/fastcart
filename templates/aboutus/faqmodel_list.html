@@ -1,0 +1,35 @@
+{% extends 'oscar/dashboard/layout.html' %}
+{% block content %}
+
+<h1 style="font-size:30px"> FAQ</h1>
+<div align="right" >
+    <a style="width:200px"  href="{% url 'aboutus-dashboard:faq-add' %}" class="btn btn-success  m-3">Add FAQ + </a>
+
+</div>
+    <!-- Iterate over object_list -->
+<table class="table table-striped table-bordered table-hover">
+
+    <tr>
+        <th>Question</th>
+        <th>Answer</th>
+        <th>Action</th>
+    </tr>
+    {% for object in object_list %}
+            <tr>
+                <td>{{ object.title }}</td>
+                <td>{{ object.description  }}</td>
+                <td>
+<!--                    <a class="btn btn-success" href="{{object.pk}} "> View</a>-->
+                    <a style="width:60px" class="btn btn-outline-info btn-sm" href="{{object.pk}}/update">Update</a>
+                    <a style="width:60px" class="btn btn-outline-danger btn-sm mt-2" href="{{object.pk}}/delete"> Delete </a>
+                </td>
+
+            </tr>
+        {% empty %}
+    <li>No objects yet.</li>
+    {% endfor %}
+        </table>
+
+
+</ul>
+{% endblock%}
